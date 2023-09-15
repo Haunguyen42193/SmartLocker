@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartLocker.Data;
 using SmartLocker.Models;
+using SmartLockerAPI.Models;
+using SmartLockerAPI.Services;
 
 namespace SmartLockerAPI.Controllers
 {
@@ -15,10 +17,12 @@ namespace SmartLockerAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly SmartLockerContext _context;
+        private IUserService _userService;
 
-        public UsersController(SmartLockerContext context)
+        public UsersController(SmartLockerContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         // GET: api/Users
@@ -138,7 +142,7 @@ namespace SmartLockerAPI.Controllers
                 return Problem("Entity set 'SmartLockerContext.Users'  is null.");
             }
             var users = _context.Users.ToList();
-            foreach(var u in users)
+            foreach (var u in users)
             {
                 if (u.Phone == phone && u.Password == password)
                 {
@@ -159,6 +163,17 @@ namespace SmartLockerAPI.Controllers
         private bool UserExists(string id)
         {
             return (_context.Users?.Any(e => e.UserId == id)).GetValueOrDefault();
+        }
+
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate(AuthenticateRequest model)
+        {
+            var response = _userService.Authenticate(model);
+
+            if (response == null)
+                return BadRequest(new { message = "Username or password is incorrect" });
+
+            return Ok(response);
         }
     }
 }

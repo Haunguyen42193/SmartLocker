@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace SmartLocker.Models;
@@ -15,6 +16,7 @@ public partial class User
 
     public string RoleId { get; set; } = null!;
 
+    [JsonIgnore]
     public string Password { get; set; } = null!;
 
     public virtual ICollection<History> Histories { get; set; } = new List<History>();

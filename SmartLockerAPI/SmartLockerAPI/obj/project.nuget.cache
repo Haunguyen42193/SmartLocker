@@ -1,10 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "nufcx5M8DXwZJpDz+zTuryM+UwMwMGju3WGjTTrx94j28kvmPslISm6torRNrFRq/QCwrobktoKZ2w81qO9niA==",
+  "dgSpecHash": "8LX5zrjApQS2nAr00cDALWMXUctm49392r3ztVZFMkpqOBVZtpaf2KcSxzXyEKg1LGvIAOZitP662XnfFCq/Ag==",
   "success": true,
-  "projectFilePath": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
+  "projectFilePath": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerApi\\SmartLockerAPI\\SmartLockerAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\entityframework\\6.4.4\\entityframework.6.4.4.nupkg.sha512",
+    "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\fluentmigrator.abstractions\\3.3.2\\fluentmigrator.abstractions.3.3.2.nupkg.sha512",
+    "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\fluentmigrator.runner.core\\3.3.2\\fluentmigrator.runner.core.3.3.2.nupkg.sha512",
+    "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\fluentmigrator.runner.mysql\\3.3.2\\fluentmigrator.runner.mysql.3.3.2.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\google.protobuf\\3.21.9\\google.protobuf.3.21.9.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
@@ -243,6 +246,7 @@
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\system.threading.tasks.dataflow\\6.0.0\\system.threading.tasks.dataflow.6.0.0.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\system.threading.timer\\4.3.0\\system.threading.timer.4.3.0.nupkg.sha512",
+    "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\system.valuetuple\\4.4.0\\system.valuetuple.4.4.0.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\system.xml.readerwriter\\4.3.0\\system.xml.readerwriter.4.3.0.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
