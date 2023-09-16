@@ -29,6 +29,8 @@ namespace SmartLockerAPI.Controllers
           {
               return NotFound();
           }
+            /*Response.Headers.Add("Access-Control-Allow-Origin", "*"); // Cho phép truy cập từ mọi nguồn
+            Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE"); // Cho phép các phương thức HTTP*/
             return await _context.Users.ToListAsync();
         }
 
