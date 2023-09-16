@@ -8,6 +8,7 @@ namespace SmartLockerAPI.Models
         public string name { get; set; }
         public string mail { get; set; }
         public string phone { get; set; }
+        public String role { get; set; }
         public string Token { get; set; }
 
 
@@ -17,6 +18,7 @@ namespace SmartLockerAPI.Models
             name = user.Name;
             mail = user.Mail;
             phone = user.Phone;
+            role = user.RoleId;
             Token = token;
         }
     }
