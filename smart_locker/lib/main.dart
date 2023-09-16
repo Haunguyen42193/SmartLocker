@@ -43,34 +43,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
-// class LoginScreen extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Đăng nhập'),
-//       ),
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: <Widget>[
-//             TextField(
-//               decoration: InputDecoration(labelText: 'Tên đăng nhập'),
-//             ),
-//             TextField(
-//               decoration: InputDecoration(labelText: 'Mật khẩu'),
-//               obscureText: true,
-//             ),
-//             ElevatedButton(
-//               onPressed: () {
-//                 // Xử lý đăng nhập ở đây
-//               },
-//               child: Text('Đăng nhập'),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

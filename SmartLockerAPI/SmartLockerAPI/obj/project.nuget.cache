@@ -1,10 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "i5/L/a9F22KbkcBa7U+Qu5QRxB1EdPGD8gQQrXLmkLys3eBOMWkcP22MXiFKtXUVv4XZtXoPMLdtuhjrZMb1Wg==",
+  "dgSpecHash": "zwPF2wDn/2/DY6Er7wDKE7+Pc/0ziJOtFjydVIpZqKHlGge2C6Zjpjxxvex86b8Z3/AA+A0cDfUxEaAY5wZphQ==",
   "success": true,
   "projectFilePath": "B:\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ACER\\.nuget\\packages\\entityframework\\6.4.4\\entityframework.6.4.4.nupkg.sha512",
+    "C:\\Users\\ACER\\.nuget\\packages\\fluentmigrator.abstractions\\3.3.2\\fluentmigrator.abstractions.3.3.2.nupkg.sha512",
+    "C:\\Users\\ACER\\.nuget\\packages\\fluentmigrator.runner.core\\3.3.2\\fluentmigrator.runner.core.3.3.2.nupkg.sha512",
+    "C:\\Users\\ACER\\.nuget\\packages\\fluentmigrator.runner.mysql\\3.3.2\\fluentmigrator.runner.mysql.3.3.2.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\google.protobuf\\3.21.9\\google.protobuf.3.21.9.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
@@ -243,6 +246,7 @@
     "C:\\Users\\ACER\\.nuget\\packages\\system.threading.tasks.dataflow\\6.0.0\\system.threading.tasks.dataflow.6.0.0.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\system.threading.timer\\4.3.0\\system.threading.timer.4.3.0.nupkg.sha512",
+    "C:\\Users\\ACER\\.nuget\\packages\\system.valuetuple\\4.4.0\\system.valuetuple.4.4.0.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\system.xml.readerwriter\\4.3.0\\system.xml.readerwriter.4.3.0.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
