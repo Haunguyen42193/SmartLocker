@@ -153,7 +153,7 @@ class Reserve extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => OrderLocker(),
+                    builder: (context) => OrderLocker(authStatus: authStatus),
                   ),
                 );
               } else {
