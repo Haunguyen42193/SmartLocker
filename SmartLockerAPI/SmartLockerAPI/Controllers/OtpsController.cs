@@ -5,11 +5,13 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Humanizer;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using MimeKit;
 using OtpSharp;
 using SmartLocker.Data;
 using SmartLocker.Models;
@@ -213,6 +215,45 @@ namespace SmartLockerAPI.Controllers
 
             return Ok(new { otp = otpCode });
         }
+
+        //[Authorize]
+        [HttpPost("sendmail")]
+        public async Task<IActionResult> SendMail([FromBody] MailData mailData)
+        {
+            if (mailData.UserId == null) return BadRequest();
+            var user = _context.Users.Find(mailData.UserId);
+            if (user == null) return BadRequest();
+            try
+            {
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress("SmartLocker", "smartlocker894@gmail.com"));
+                message.To.Add(new MailboxAddress(user.Name, user.Mail));
+                message.Subject = "You have request on SmartLocker";
+
+                string messageText = $"Hi {user.Name},\n\nThis is your OTP code: {mailData.OTP} to use SmartLocker\n\n-- SmartLocker";
+
+                message.Body = new TextPart("plain")
+                {
+                    Text = messageText
+                };
+
+
+                using (var client = new SmtpClient())
+                {
+                    await client.ConnectAsync("smtp.gmail.com", 587, false); // SMTP server và cổng
+                    await client.AuthenticateAsync("smartlocker894@gmail.com", "mmlc clpt nhal xnwn"); // Tên đăng nhập và mật khẩu email của bạn
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+                }
+
+                return Ok("Email sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Email sending failed: {ex.Message}");
+            }
+        }
+
         static string GenerateRandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -228,5 +269,10 @@ namespace SmartLockerAPI.Controllers
 
             return stringBuilder.ToString();
         }
+    }
+    public class MailData
+    {
+        public string UserId { get; set; }
+        public string OTP { get; set; }
     }
 }
