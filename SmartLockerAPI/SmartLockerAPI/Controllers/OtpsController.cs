@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -167,38 +168,50 @@ namespace SmartLockerAPI.Controllers
             }
             var userId = response;
             Random random = new Random();
-            List<Locker> lockers = _context.Lockers.Where(x => x.Status == "on").ToList();
-            int randomIndex = random.Next(lockers.Count);
-
-            // Lấy locker tại vị trí ngẫu nhiên
-            Locker randomLocker = lockers[randomIndex];
-
-            if (randomLocker != null && userId != null)
+            var listLockers = _context.Lockers.Where(x => x.Status == "on");
+            List<Locker> lockers;
+            int randomIndex;
+            Locker randomLocker;
+            if (listLockers.Any())
             {
-                
-                byte[] newSecretKey = Encoding.UTF8.GetBytes(GenerateRandomString(50));
-                // Tạo mới OTP
-                var totp = new Totp(newSecretKey, step: 10800);
-                var otpCode = totp.ComputeTotp(DateTime.UtcNow);
-
-                Guid guid = Guid.NewGuid();
-                OtpSecretKey otpSecret = new OtpSecretKey(newSecretKey, otpCode);
-                _secretKeys.Add(otpSecret);
-                Otp otp = new Otp
-                {
-                    OtpId = guid.ToString(),
-                    OtpCode = otpCode,
-                    ExpirationTime = DateTime.Now.AddHours(3),
-                    UserId = userId,
-                    LockerId = randomLocker.LockerId
-                };
-                randomLocker.Status = "off";
-                _context.Otps.Add(otp);
-                _context.SaveChanges();
-
-                return Ok(new { otp = otpCode });
+                lockers = listLockers.ToList();
+                randomIndex = random.Next(lockers.Count);
+                randomLocker = lockers[randomIndex];
             }
-            return BadRequest();
+            else
+            {
+                lockers = new List<Locker>();
+                randomLocker = new Locker();
+            }
+            if(lockers.Count() > 0 && randomLocker.LockerId != null)
+            {
+                return BadRequest(new { title = "No locker" });
+            }
+            if(userId != null)
+            {
+                return Unauthorized(new { title = "No user login" });
+            }   
+            byte[] newSecretKey = Encoding.UTF8.GetBytes(GenerateRandomString(50));
+            // Tạo mới OTP
+            var totp = new Totp(newSecretKey, step: 10800);
+            var otpCode = totp.ComputeTotp(DateTime.UtcNow);
+
+            Guid guid = Guid.NewGuid();
+            OtpSecretKey otpSecret = new OtpSecretKey(newSecretKey, otpCode);
+            _secretKeys.Add(otpSecret);
+            Otp otp = new Otp
+            {
+                OtpId = guid.ToString(),
+                OtpCode = otpCode,
+                ExpirationTime = DateTime.Now.AddHours(3),
+                UserId = userId,
+                LockerId = randomLocker.LockerId
+            };
+            randomLocker.Status = "off";
+            _context.Otps.Add(otp);
+            _context.SaveChanges();
+
+            return Ok(new { otp = otpCode });
         }
         static string GenerateRandomString(int length)
         {
