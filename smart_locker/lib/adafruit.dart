@@ -20,7 +20,7 @@ class AdafruitIoClient {
     // await FlutterConfig.loadEnvVariables();
     // final apiKey = FlutterConfig.get('YOUR_API_KEY');
     final MqttClientConnectionStatus? connectionStatus =
-        await client.connect(username, 'aio_CAiB76Eceq8tuS4Qw0fzWi4Qn8wf');
+        await client.connect(username, 'aio_Skzh53SB6VTRhD6Yk32adYL8eG2a');
 
     if (connectionStatus != null) {
       print('Connected: ${connectionStatus.state}');
@@ -57,6 +57,8 @@ class AdafruitIoClient {
 //   final adafruitClient =
 //       AdafruitIoClient('', ''); // Không cần truyền apiKey ở đây
 
+//   bool isButtonPressed = false; // Biến để theo dõi trạng thái nút "SendOTP"
+
 //   try {
 //     await adafruitClient.connect('nghiavahau');
 
@@ -64,24 +66,23 @@ class AdafruitIoClient {
 //         MqttConnectionState.connected) {
 //       print('Connected to Adafruit IO');
 
-//       // Đăng ký một feed để theo dõi
-//       adafruitClient.subscribe('SendOTP');
+//       adafruitClient.subscribe('SendOTP'); // Đăng ký theo dõi feed "SendOTP"
+//       adafruitClient.subscribe('Nhatky'); // Đăng ký theo dõi feed "Nhatky"
 
-//       // Gửi dữ liệu lên feed
-//       // adafruitClient.publish('Nhatky', 'Hello, Nghĩa nè!');
-
-//       // Lắng nghe các cập nhật từ feed
-//       adafruitClient
-//           .getUpdates()
-//           .listen((List<MqttReceivedMessage<MqttMessage>> event) {
+//       // Lắng nghe các cập nhật từ cả hai feed
+//       adafruitClient.getUpdates().listen((List<MqttReceivedMessage<MqttMessage>> event) {
 //         final message = event[0].payload.toString();
-//         print('Received message: $message');
+//         final topic = event[0].topic;
 
-//         if (message == '1') {
-//           // Người dùng đã bấm, thực hiện hành động tương ứng ở đây
-//           print('Nghĩa đã bấm nút gửi otp');
+//         print('Received message on topic $topic: $message');
+
+//         // Kiểm tra nếu message là '1' (nút SendOTP được bấm), thì gửi dữ liệu mới lên feed "Nhatky"
+//         if (topic == 'nghiavahau/feeds/SendOTP' && message == '1') {
+//           // Thay đổi dữ liệu cần gửi lên feed "Nhatky" ở đây
+//           final newDataForNhatky = 'New data for Nhatky feed';
+//           adafruitClient.publish('Nhatky', newDataForNhatky);
+//           print('Updated Nhatky feed with new data: $newDataForNhatky');
 //         }
-
 //       });
 
 //       // Đợi một khoảng thời gian sau đó ngắt kết nối

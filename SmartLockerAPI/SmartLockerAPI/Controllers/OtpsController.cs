@@ -183,11 +183,11 @@ namespace SmartLockerAPI.Controllers
                 lockers = new List<Locker>();
                 randomLocker = new Locker();
             }
-            if(lockers.Count() > 0 && randomLocker.LockerId != null)
+            if(lockers.Count() <= 0 && randomLocker.LockerId == null)
             {
                 return BadRequest(new { title = "No locker" });
             }
-            if(userId != null)
+            if(userId == null)
             {
                 return Unauthorized(new { title = "No user login" });
             }   

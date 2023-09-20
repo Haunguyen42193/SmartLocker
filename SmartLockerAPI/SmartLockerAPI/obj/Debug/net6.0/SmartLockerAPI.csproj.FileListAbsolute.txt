@@ -876,3 +876,5 @@ E:\HK9\DAN\Project1\SmartLocker\SmartLockerAPI\SmartLockerAPI\obj\Debug\net6.0\S
 E:\HK9\DAN\Project1\SmartLocker\SmartLockerAPI\SmartLockerAPI\obj\Debug\net6.0\ref\SmartLockerAPI.dll
 E:\HK9\DAN\Project1\SmartLocker\SmartLockerAPI\SmartLockerAPI\bin\Debug\net6.0\OtpSharp.Core.dll
 E:\HK9\DAN\Project1\SmartLocker\SmartLockerAPI\SmartLockerAPI\bin\Debug\net6.0\Wiry.Base32.dll
+B:\SmartLocker\SmartLockerAPI\SmartLockerAPI\bin\Debug\net6.0\OtpSharp.Core.dll
+B:\SmartLocker\SmartLockerAPI\SmartLockerAPI\bin\Debug\net6.0\Wiry.Base32.dll
