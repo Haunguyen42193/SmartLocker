@@ -12826,11 +12826,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
+      "projectUniqueName": "E:\\HK9\\DAN\\project2\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
       "projectName": "SmartLockerAPI",
-      "projectPath": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
+      "projectPath": "E:\\HK9\\DAN\\project2\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
       "packagesPath": "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\",
-      "outputPath": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\obj\\",
+      "outputPath": "E:\\HK9\\DAN\\project2\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

@@ -159,14 +159,14 @@ namespace SmartLockerAPI.Controllers
 
         [Authorize]
         [HttpPost("generatedotp")]
-        public async Task<IActionResult> GenerateOtpAsync()
+        public Task<IActionResult> GenerateOtpAsync()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             byte[] secretKey = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var response = _tokenService.GetUserIdFromToken(token, secretKey);
             if (response == null)
             {
-                return BadRequest("Invalid token");
+                return Task.FromResult<IActionResult>(BadRequest("Invalid token"));
             }
             var userId = response;
             Random random = new Random();
@@ -187,11 +187,11 @@ namespace SmartLockerAPI.Controllers
             }
             if(lockers.Count() <= 0 && randomLocker.LockerId == null)
             {
-                return BadRequest(new { title = "No locker" });
+                return Task.FromResult<IActionResult>(BadRequest(new { title = "No locker" }));
             }
             if(userId == null)
             {
-                return Unauthorized(new { title = "No user login" });
+                return Task.FromResult<IActionResult>(Unauthorized(new { title = "No user login" }));
             }   
             byte[] newSecretKey = Encoding.UTF8.GetBytes(GenerateRandomString(50));
             // Tạo mới OTP
@@ -213,7 +213,7 @@ namespace SmartLockerAPI.Controllers
             _context.Otps.Add(otp);
             _context.SaveChanges();
 
-            return Ok(new { otp = otpCode });
+            return Task.FromResult<IActionResult>(Ok(new { otp = otpCode }));
         }
 
         //[Authorize]
@@ -272,7 +272,7 @@ namespace SmartLockerAPI.Controllers
     }
     public class MailData
     {
-        public string UserId { get; set; }
-        public string OTP { get; set; }
+        public string? UserId { get; set; }
+        public string? OTP { get; set; }
     }
 }

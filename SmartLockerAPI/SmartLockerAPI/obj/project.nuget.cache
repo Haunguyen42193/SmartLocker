@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "nFFTM+RdElj16ur+8P7Ow0SCZtvKP1DBlDl37nmOoagfn2ZXmPTg2um5V5USJnDzy+9iadX7e/SezyTdhDQ82g==",
+  "dgSpecHash": "kD+pSdUZ7dBzRcfmkJzKgbfWY5f/JpecgJl9BL1q7aA6tScnkM1C0yJUjtGYSbn4XUq1btq0kATN3Vd5wqHHrw==",
   "success": true,
-  "projectFilePath": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
+  "projectFilePath": "E:\\HK9\\DAN\\project2\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\entityframework\\6.4.4\\entityframework.6.4.4.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\fluentmigrator.abstractions\\3.3.2\\fluentmigrator.abstractions.3.3.2.nupkg.sha512",
