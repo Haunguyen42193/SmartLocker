@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5XDQHdoGCYA3JLKL9/s4uOS9oeDnNPR1JztzuwqVUfDgUY0CpMJIS2pviuGjPy01oP2RHwSSdzopKYloAdZ9Vg==",
+  "dgSpecHash": "nFFTM+RdElj16ur+8P7Ow0SCZtvKP1DBlDl37nmOoagfn2ZXmPTg2um5V5USJnDzy+9iadX7e/SezyTdhDQ82g==",
   "success": true,
-  "projectFilePath": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerApi\\SmartLockerAPI\\SmartLockerAPI.csproj",
+  "projectFilePath": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\entityframework\\6.4.4\\entityframework.6.4.4.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\fluentmigrator.abstractions\\3.3.2\\fluentmigrator.abstractions.3.3.2.nupkg.sha512",
@@ -262,12 +262,5 @@
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\wiry.base32.patched\\1.0.5.1\\wiry.base32.patched.1.0.5.1.nupkg.sha512",
     "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\zstdsharp.port\\0.7.1\\zstdsharp.port.0.7.1.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerApi\\SmartLockerAPI\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    }
-  ]
+  "logs": []
 }
