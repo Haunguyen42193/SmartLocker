@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using NuGet.Versioning;
 using OtpSharp;
 using SmartLocker.Data;
 using SmartLocker.Models;
@@ -159,26 +160,40 @@ namespace SmartLockerAPI.Controllers
 
         [Authorize]
         [HttpPost("generatedotp")]
-        public async Task<IActionResult> GenerateOtpAsync()
+        public async Task<IActionResult> GenerateOtpAsync([FromBody] OtpData data)
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             byte[] secretKey = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var response = _tokenService.GetUserIdFromToken(token, secretKey);
-            if (response == null)
+            if (data.UserId == null)
             {
                 return BadRequest("Invalid token");
             }
-            var userId = response;
             Random random = new Random();
-            var listLockers = _context.Lockers.Where(x => x.Status == "on");
+            var listLockers = _context.Lockers.Where(x => x.Location == data.LocationSend);
             List<Locker> lockers;
             int randomIndex;
             Locker randomLocker;
-            if (listLockers.Any())
+            var listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == null && x.Locker.Location == data.LocationSend).ToList();
+            User user = _context.Users.Find(data.UserId);
+            if (listLockers.Any() && listHistories.Any())
             {
                 lockers = listLockers.ToList();
-                randomIndex = random.Next(lockers.Count);
-                randomLocker = lockers[randomIndex];
+                var flag = true;
+                do
+                {
+                    randomIndex = random.Next(lockers.Count);
+                    randomLocker = lockers[randomIndex];
+                    foreach (History h in listHistories)
+                    {
+                        if (randomLocker.LockerId == h.LockerId)
+                        {
+                            flag = false;
+                            break;
+                        }    
+                    }
+                } while (flag);
+
             }
             else
             {
@@ -187,9 +202,9 @@ namespace SmartLockerAPI.Controllers
             }
             if(lockers.Count() <= 0 && randomLocker.LockerId == null)
             {
-                return BadRequest(new { title = "No locker" });
+                return BadRequest(new { title = "No locker at this time" });
             }
-            if(userId == null)
+            if(data.UserId == null)
             {
                 return Unauthorized(new { title = "No user login" });
             }   
@@ -206,17 +221,60 @@ namespace SmartLockerAPI.Controllers
                 OtpId = guid.ToString(),
                 OtpCode = otpCode,
                 ExpirationTime = DateTime.Now.AddHours(3),
-                UserId = userId,
+                UserId = data.UserId,
                 LockerId = randomLocker.LockerId
             };
-            randomLocker.Status = "off";
+            if (user.RoleId == "3")
+            {
+                listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == null && x.Locker.Location == data.LocationReceive).ToList();
+                int randomIndexShipper;
+                Locker randomLockerShipper;
+                listLockers = _context.Lockers.Where(x => x.Location == data.LocationReceive);
+                if (listLockers.Any() && listHistories.Any())
+                {
+                    lockers = listLockers.ToList();
+                    var flag = true;
+                    do
+                    {
+                        randomIndexShipper = random.Next(lockers.Count);
+                        randomLockerShipper = lockers[randomIndexShipper];
+                        foreach (History h in listHistories)
+                        {
+                            if (randomLockerShipper.LockerId == h.LockerId)
+                            {
+                                flag = false;
+                                break;
+                            }
+                        }
+                    } while (flag);
+                }
+                else
+                {
+                    lockers = new List<Locker>();
+                    randomLockerShipper = new Locker();
+                }
+                if (lockers.Count() <= 0 && randomLockerShipper.LockerId == null)
+                {
+                    return BadRequest(new { title = "No locker at this time" });
+                }
+                History his = _context.Histories.Where(x => x.StartTime == data.StartTime && x.LockerId == randomLockerShipper.LockerId && x.UserId == null).ToList().FirstOrDefault();
+                if (his != null)
+                {
+                    his.UserId = data.UserId;
+                }
+            }
+            History history = _context.Histories.Where(x => x.StartTime == data.StartTime && x.LockerId == randomLocker.LockerId && x.UserId == null).ToList().FirstOrDefault();
+            if (history != null)
+            {
+                history.UserId = data.UserId;
+            }
             _context.Otps.Add(otp);
             _context.SaveChanges();
 
             return Ok(new { otp = otpCode });
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost("sendmail")]
         public async Task<IActionResult> SendMail([FromBody] MailData mailData)
         {
@@ -230,7 +288,7 @@ namespace SmartLockerAPI.Controllers
                 message.To.Add(new MailboxAddress(user.Name, user.Mail));
                 message.Subject = "You have request on SmartLocker";
 
-                string messageText = $"Hi {user.Name},\n\nThis is your OTP code: {mailData.OTP} to use SmartLocker\n\n-- SmartLocker";
+                string messageText = mailData.MailContent;
 
                 message.Body = new TextPart("plain")
                 {
@@ -273,6 +331,14 @@ namespace SmartLockerAPI.Controllers
     public class MailData
     {
         public string UserId { get; set; }
-        public string OTP { get; set; }
+        public string MailContent { get; set; }
+    }
+
+    public class OtpData
+    {
+        public string UserId { get; set; }
+        public string StartTime { get; set; }
+        public string LocationSend { get; set; }
+        public string LocationReceive { get; set; }
     }
 }

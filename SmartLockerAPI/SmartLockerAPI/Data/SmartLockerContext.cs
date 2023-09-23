@@ -30,7 +30,7 @@ public partial class SmartLockerContext : DbContext
 
         modelBuilder.Entity<History>(entity =>
         {
-            entity.HasKey(e => e.HistoyId).HasName("PRIMARY");
+            entity.HasKey(e => e.HistoryId).HasName("PRIMARY");
 
             entity.ToTable("histories");
 
@@ -38,17 +38,17 @@ public partial class SmartLockerContext : DbContext
 
             entity.HasIndex(e => e.UserId, "fk_histories_users_idx");
 
-            entity.Property(e => e.HistoyId)
+            entity.Property(e => e.HistoryId)
                 .HasMaxLength(45)
-                .HasColumnName("histoy_id");
+                .HasColumnName("history_id");
             entity.Property(e => e.EndTime)
-                .HasColumnType("datetime")
+                .HasMaxLength(45)
                 .HasColumnName("end_time");
             entity.Property(e => e.LockerId)
                 .HasMaxLength(45)
                 .HasColumnName("locker_id");
             entity.Property(e => e.StartTime)
-                .HasColumnType("datetime")
+                .HasMaxLength(45)
                 .HasColumnName("start_time");
             entity.Property(e => e.UserId)
                 .HasMaxLength(45)
@@ -77,9 +77,6 @@ public partial class SmartLockerContext : DbContext
             entity.Property(e => e.Location)
                 .HasMaxLength(45)
                 .HasColumnName("location");
-            entity.Property(e => e.OtpId)
-                .HasMaxLength(45)
-                .HasColumnName("otp_id");
             entity.Property(e => e.Status)
                 .HasColumnType("enum('on','off')")
                 .HasColumnName("status");
