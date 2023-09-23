@@ -160,7 +160,7 @@ namespace SmartLockerAPI.Controllers
 
         [Authorize]
         [HttpPost("generatedotp")]
-        public async Task<IActionResult> GenerateOtpAsync([FromBody] OtpData data)
+        public IActionResult GenerateOtp([FromBody] OtpData data)
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             byte[] secretKey = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -190,7 +190,7 @@ namespace SmartLockerAPI.Controllers
                         {
                             flag = false;
                             break;
-                        }    
+                        }
                     }
                 } while (flag);
 
@@ -200,14 +200,14 @@ namespace SmartLockerAPI.Controllers
                 lockers = new List<Locker>();
                 randomLocker = new Locker();
             }
-            if(lockers.Count() <= 0 && randomLocker.LockerId == null)
+            if (lockers.Count() <= 0 && randomLocker.LockerId == null)
             {
                 return BadRequest(new { title = "No locker at this time" });
             }
-            if(data.UserId == null)
+            if (data.UserId == null)
             {
                 return Unauthorized(new { title = "No user login" });
-            }   
+            }
             byte[] newSecretKey = Encoding.UTF8.GetBytes(GenerateRandomString(50));
             // Tạo mới OTP
             var totp = new Totp(newSecretKey, step: 10800);
