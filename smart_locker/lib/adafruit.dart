@@ -6,6 +6,9 @@ import 'package:typed_data/typed_data.dart' show Uint8Buffer;
 import 'package:flutter_config/flutter_config.dart';
 import 'package:flutter/widgets.dart';
 
+import 'package:intl/intl.dart';
+
+
 class AdafruitIoClient {
   final MqttServerClient client;
 
@@ -53,46 +56,13 @@ class AdafruitIoClient {
   }
 }
 
-// void main() async {
-//   final adafruitClient =
-//       AdafruitIoClient('', ''); // Không cần truyền apiKey ở đây
+// void main() {
+//   // Lấy thời gian hiện tại
+//   final now = DateTime.now();
 
-//   bool isButtonPressed = false; // Biến để theo dõi trạng thái nút "SendOTP"
+//   // Định dạng thời gian thành chuỗi
+//   final formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
 
-//   try {
-//     await adafruitClient.connect('nghiavahau');
-
-//     if (adafruitClient.client.connectionStatus?.state ==
-//         MqttConnectionState.connected) {
-//       print('Connected to Adafruit IO');
-
-//       adafruitClient.subscribe('SendOTP'); // Đăng ký theo dõi feed "SendOTP"
-//       adafruitClient.subscribe('Nhatky'); // Đăng ký theo dõi feed "Nhatky"
-
-//       // Lắng nghe các cập nhật từ cả hai feed
-//       adafruitClient.getUpdates().listen((List<MqttReceivedMessage<MqttMessage>> event) {
-//         final message = event[0].payload.toString();
-//         final topic = event[0].topic;
-
-//         print('Received message on topic $topic: $message');
-
-//         // Kiểm tra nếu message là '1' (nút SendOTP được bấm), thì gửi dữ liệu mới lên feed "Nhatky"
-//         if (topic == 'nghiavahau/feeds/SendOTP' && message == '1') {
-//           // Thay đổi dữ liệu cần gửi lên feed "Nhatky" ở đây
-//           final newDataForNhatky = 'New data for Nhatky feed';
-//           adafruitClient.publish('Nhatky', newDataForNhatky);
-//           print('Updated Nhatky feed with new data: $newDataForNhatky');
-//         }
-//       });
-
-//       // Đợi một khoảng thời gian sau đó ngắt kết nối
-//       await Future.delayed(Duration(seconds: 5));
-//       adafruitClient.disconnect();
-//       print('Disconnected from Adafruit IO');
-//     } else {
-//       print('Failed to connect to Adafruit IO');
-//     }
-//   } catch (e) {
-//     print('Exception: $e');
-//   }
+//   // In ra thời gian đã định dạng
+//   print('Thời gian hiện tại là: $formattedTime');
 // }

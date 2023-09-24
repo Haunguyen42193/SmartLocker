@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'config.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final response = await http.post(
       Uri.parse(
-          'https://12fa-116-110-42-229.ngrok-free.app/api/Users/authenticate'),
+          '$endpoint/api/Users/authenticate'),
       body: jsonEncode({'phone': username, 'password': password}),
       headers: {'Content-Type': 'application/json'},
     );
