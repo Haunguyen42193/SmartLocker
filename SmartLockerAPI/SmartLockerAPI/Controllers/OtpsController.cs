@@ -20,6 +20,8 @@ using SmartLockerAPI.Helpers;
 using SmartLockerAPI.Models;
 using SmartLockerAPI.Services;
 using Otp = SmartLocker.Models.Otp;
+using Vonage;
+using Vonage.Request;
 
 namespace SmartLockerAPI.Controllers
 {
@@ -165,42 +167,29 @@ namespace SmartLockerAPI.Controllers
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             byte[] secretKey = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var response = _tokenService.GetUserIdFromToken(token, secretKey);
-            if (data.UserId == null)
+            if (token == null)
             {
                 return BadRequest("Invalid token");
             }
             Random random = new Random();
-            var listLockers = _context.Lockers.Where(x => x.Location == data.LocationSend);
-            List<Locker> lockers;
             int randomIndex;
-            Locker randomLocker;
             var listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == null && x.Locker.Location == data.LocationSend).ToList();
             User user = _context.Users.Find(data.UserId);
-            if (listLockers.Any() && listHistories.Any())
+            History history;
+            if (listHistories.Any())
             {
-                lockers = listLockers.ToList();
-                var flag = true;
-                do
+                randomIndex = random.Next(listHistories.Count);
+                history = listHistories[randomIndex];
+                if (history != null)
                 {
-                    randomIndex = random.Next(lockers.Count);
-                    randomLocker = lockers[randomIndex];
-                    foreach (History h in listHistories)
-                    {
-                        if (randomLocker.LockerId == h.LockerId)
-                        {
-                            flag = false;
-                            break;
-                        }
-                    }
-                } while (flag);
-
+                    history.UserId = data.UserId;
+                }
             }
             else
             {
-                lockers = new List<Locker>();
-                randomLocker = new Locker();
+                history = new History();
             }
-            if (lockers.Count() <= 0 && randomLocker.LockerId == null)
+            if (history == null)
             {
                 return BadRequest(new { title = "No locker at this time" });
             }
@@ -222,52 +211,33 @@ namespace SmartLockerAPI.Controllers
                 OtpCode = otpCode,
                 ExpirationTime = DateTime.Now.AddHours(3),
                 UserId = data.UserId,
-                LockerId = randomLocker.LockerId
+                LockerId = history.LockerId
             };
             if (user.RoleId == "3")
             {
                 listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == null && x.Locker.Location == data.LocationReceive).ToList();
                 int randomIndexShipper;
-                Locker randomLockerShipper;
-                listLockers = _context.Lockers.Where(x => x.Location == data.LocationReceive);
-                if (listLockers.Any() && listHistories.Any())
+                History randomLockerShipper;
+                if (listHistories.Any())
                 {
-                    lockers = listLockers.ToList();
-                    var flag = true;
-                    do
+                    randomIndexShipper = random.Next(listHistories.Count);
+                    randomLockerShipper = listHistories[randomIndexShipper];
+                    if (randomLockerShipper != null)
                     {
-                        randomIndexShipper = random.Next(lockers.Count);
-                        randomLockerShipper = lockers[randomIndexShipper];
-                        foreach (History h in listHistories)
-                        {
-                            if (randomLockerShipper.LockerId == h.LockerId)
-                            {
-                                flag = false;
-                                break;
-                            }
-                        }
-                    } while (flag);
+                        randomLockerShipper.UserId = data.UserId;
+                    }
                 }
                 else
                 {
-                    lockers = new List<Locker>();
-                    randomLockerShipper = new Locker();
+                    listHistories = new List<History>();
+                    randomLockerShipper = new History();
                 }
-                if (lockers.Count() <= 0 && randomLockerShipper.LockerId == null)
+                if (listHistories.Count() <= 0 || randomLockerShipper == null)
                 {
                     return BadRequest(new { title = "No locker at this time" });
                 }
-                History his = _context.Histories.Where(x => x.StartTime == data.StartTime && x.LockerId == randomLockerShipper.LockerId && x.UserId == null).ToList().FirstOrDefault();
-                if (his != null)
-                {
-                    his.UserId = data.UserId;
-                }
             }
-            History history = _context.Histories.Where(x => x.StartTime == data.StartTime && x.LockerId == randomLocker.LockerId && x.UserId == null).ToList().FirstOrDefault();
-            if (history != null)
-            {
-                history.UserId = data.UserId;
-            }
+            
             _context.Otps.Add(otp);
             _context.SaveChanges();
 
@@ -327,6 +297,26 @@ namespace SmartLockerAPI.Controllers
 
             return stringBuilder.ToString();
         }
+
+        [Authorize]
+        [HttpPost("sendsms")]
+        public async Task<IActionResult> SendSMS([FromBody] MailData mailData)
+        {
+            var credentials = Credentials.FromApiKeyAndSecret(
+                            "9e589e6e",
+                            "YOSL7eg3RqUx0Y3d"
+                            );
+
+            var VonageClient = new VonageClient(credentials);
+            var response = VonageClient.SmsClient.SendAnSms(new Vonage.Messaging.SendSmsRequest()
+            {
+                To = "84899256655",
+                From = "SmartLocker",
+                Text = mailData.MailContent
+            });
+            return Ok("Send sms successfull!");
+        }
+
     }
     public class MailData
     {
