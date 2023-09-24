@@ -3,7 +3,6 @@ import 'models.dart';
 import 'login_screen.dart';
 import 'account.dart';
 import 'order-locker.dart';
-
 void main() => runApp(MyApp(authStatus: null));
 
 class MyApp extends StatelessWidget {
