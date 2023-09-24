@@ -171,29 +171,51 @@ namespace SmartLockerAPI.Controllers
             {
                 return BadRequest("Invalid token");
             }
-            Random random = new Random();
-            int randomIndex;
-            var listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == null && x.Locker.Location == data.LocationSend).ToList();
-            User user = _context.Users.Find(data.UserId);
-            History history;
-            if (listHistories.Any())
+            var user = new User();
+            if (data.UserIdReceive != null)
             {
-                randomIndex = random.Next(listHistories.Count);
-                history = listHistories[randomIndex];
-                if (history != null)
-                {
-                    history.UserId = data.UserId;
-                }
+                user = _context.Users.Find(data.UserIdReceive);
             }
             else
             {
-                history = new History();
+                user = _context.Users.Find(data.UserIdSend);
             }
-            if (history == null)
+            Random random = new Random();
+            int randomIndex;
+            var listHistories = new List<History>();
+            listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == null && x.Locker.Location == data.LocationSend).ToList();
+            History history;
+            if (data.UserIdReceive != null)
+            {
+                if (_context.Users.Find(data.UserIdSend).RoleId != "3")
+                    history = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == data.UserIdSend && x.Locker.Location == data.LocationSend).ToList().FirstOrDefault();
+                else
+                    history = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == data.UserIdSend && x.Locker.Location == data.LocationReceive).ToList().FirstOrDefault();
+            }
+            else
+            {
+                if (listHistories.Any())
+                {
+                    randomIndex = random.Next(listHistories.Count);
+                    history = listHistories[randomIndex];
+                }
+                else
+                {
+                    history = new History();
+                }
+            }
+            if (history != null)
+            {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                history.UserId = user.UserId;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            }
+            
+            if (history.HistoryId == null)
             {
                 return BadRequest(new { title = "No locker at this time" });
             }
-            if (data.UserId == null)
+            if (user == null)
             {
                 return Unauthorized(new { title = "No user login" });
             }
@@ -210,7 +232,7 @@ namespace SmartLockerAPI.Controllers
                 OtpId = guid.ToString(),
                 OtpCode = otpCode,
                 ExpirationTime = DateTime.Now.AddHours(3),
-                UserId = data.UserId,
+                UserId = user.UserId,
                 LockerId = history.LockerId
             };
             if (user.RoleId == "3")
@@ -224,7 +246,7 @@ namespace SmartLockerAPI.Controllers
                     randomLockerShipper = listHistories[randomIndexShipper];
                     if (randomLockerShipper != null)
                     {
-                        randomLockerShipper.UserId = data.UserId;
+                        randomLockerShipper.UserId = user.UserId;
                     }
                 }
                 else
@@ -320,15 +342,16 @@ namespace SmartLockerAPI.Controllers
     }
     public class MailData
     {
-        public string UserId { get; set; }
-        public string MailContent { get; set; }
+        public string? UserId { get; set; }
+        public string? MailContent { get; set; }
     }
 
     public class OtpData
     {
-        public string UserId { get; set; }
-        public string StartTime { get; set; }
-        public string LocationSend { get; set; }
-        public string LocationReceive { get; set; }
+        public string? UserIdSend { get; set; }
+        public string? UserIdReceive { get; set; }
+        public string? StartTime { get; set; }
+        public string? LocationSend { get; set; }
+        public string? LocationReceive { get; set; }
     }
 }
