@@ -1,1 +1,1 @@
-const String endpoint = "https://ec21-116-110-42-229.ngrok-free.app";
+const String endpoint = "https://7ad7-116-110-42-229.ngrok-free.app";
