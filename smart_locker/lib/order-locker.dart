@@ -1,8 +1,8 @@
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:smart_locker/comfirm_order.dart';
 import 'package:smart_locker/models.dart';
 import 'config.dart';
 
@@ -175,7 +175,7 @@ class _OrderLockerState extends State<OrderLocker> {
       otp = jsonDecode(response.body)['otp'];
       String messageMail =
           "Hi $userName,\n\nYour OTP is $otp.\n\nUsing this for unlocked Smartlocker\n\nContact us: 0987654321";
-          
+
       final response2 = await http.post(
         Uri.parse('$endpoint/api/Otps/sendmail'),
         body: jsonEncode({
@@ -188,6 +188,12 @@ class _OrderLockerState extends State<OrderLocker> {
         },
       );
       _showSnackBar('Đã gửi mã OTP qua gmail. Hãy kiểm tra email của bạn.');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                ConfirmOrderScreen(authStatus: widget.authStatus)),
+      );
     } else if (response.statusCode == 400) {
       print('Hết tủ');
     } else if (response.statusCode == 401) {
