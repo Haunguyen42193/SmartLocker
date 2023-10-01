@@ -108,13 +108,18 @@ namespace SmartLockerAPI.Controllers
         // POST: api/Otps
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Otp>> PostOtp(Otp otp)
+        public async Task<ActionResult<Otp>> PostOtp(PostOtp data)
         {
             if (_context.Otps == null)
             {
                 return Problem("Entity set 'SmartLockerContext.Otps'  is null.");
             }
-            _context.Otps.Add(otp);
+            Otp otp = _context.Otps.FirstOrDefault(o => o.OtpCode.Equals(data.otp));
+            if (otp == null)
+            {
+                return NotFound(new {message = "Can't find otp"});
+            }
+            otp.LockerId = data.lockerId;
             try
             {
                 await _context.SaveChangesAsync();
@@ -137,13 +142,13 @@ namespace SmartLockerAPI.Controllers
         [Authorize]
         // DELETE: api/Otps/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOtp(string id)
+        public async Task<IActionResult> DeleteOtp(string otpCode)
         {
             if (_context.Otps == null)
             {
                 return NotFound();
             }
-            var otp = await _context.Otps.FindAsync(id);
+            var otp = _context.Otps.FirstOrDefault(x => x.OtpCode == otpCode);
             if (otp == null)
             {
                 return NotFound();
@@ -165,68 +170,100 @@ namespace SmartLockerAPI.Controllers
         public IActionResult GenerateOtp([FromBody] OtpData data)
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            byte[] secretKey = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var response = _tokenService.GetUserIdFromToken(token, secretKey);
-            if (token == null)
+            var userId = GetUserIdFromToken(token);
+
+            if (userId == null)
             {
                 return BadRequest("Invalid token");
             }
-            var user = new User();
-            if (data.UserIdReceive != null)
+
+            var history = FindHistory(data);
+            if (history == null)
             {
-                user = _context.Users.Find(data.UserIdReceive);
+                return NotFound(new { message = "Don't have any order" });
             }
-            else
-            {
-                user = _context.Users.Find(data.UserIdSend);
-            }
-            Random random = new Random();
-            int randomIndex;
-            var listHistories = new List<History>();
-            listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == null && x.Locker.Location == data.LocationSend).ToList();
-            History history;
-            if (data.UserIdReceive != null)
-            {
-                if (_context.Users.Find(data.UserIdSend).RoleId != "3")
-                    history = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == data.UserIdSend && x.Locker.Location == data.LocationSend).ToList().FirstOrDefault();
-                else
-                    history = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == data.UserIdSend && x.Locker.Location == data.LocationReceive).ToList().FirstOrDefault();
-            }
-            else
-            {
-                if (listHistories.Any())
-                {
-                    randomIndex = random.Next(listHistories.Count);
-                    history = listHistories[randomIndex];
-                }
-                else
-                {
-                    history = new History();
-                }
-            }
-            if (history != null)
-            {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                history.UserId = user.UserId;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-            }
-            
-            if (history.HistoryId == null)
-            {
-                return BadRequest(new { title = "No locker at this time" });
-            }
+
+            var user = GetUser(data, userId);
             if (user == null)
             {
                 return Unauthorized(new { title = "No user login" });
             }
-            byte[] newSecretKey = Encoding.UTF8.GetBytes(GenerateRandomString(50));
-            // Tạo mới OTP
-            var totp = new Totp(newSecretKey, step: 10800);
-            var otpCode = totp.ComputeTotp(DateTime.UtcNow);
 
+            var otpCode = GenerateOtpCode();
+            var otp = SaveOtp(otpCode, user, history);
+
+            return Ok(new { otp = otpCode, historyId = history.HistoryId });
+        }
+
+        private string GetUserIdFromToken(string token)
+        {
+            byte[] secretKey = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            return _tokenService.GetUserIdFromToken(token, secretKey);
+        }
+
+        private History FindHistory(OtpData data)
+        {
+            Random random = new Random();
+            History history;
+            if (data.UserIdReceive == null) 
+            {
+                var listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserSend == null && x.Locker.Location == data.LocationSend).ToList();
+                if (listHistories.Any())
+                {
+                    // Nếu có ít nhất một History thích hợp, chọn một ngẫu nhiên
+                    int randomIndex;
+                    randomIndex = random.Next(listHistories.Count);
+                    history = listHistories[randomIndex];
+                    return history;
+                }
+                return null;
+            }
+            else
+            {
+                var tmp = _context.Histories.FirstOrDefault(x => x.Shipper == data.UserIdReceive && x.StartTime == data.StartTime && x.Locker.Location == data.LocationSend);
+                var tmp2 = _context.Histories.FirstOrDefault(x => x.Shipper == data.UserIdReceive && x.StartTime == data.StartTime && x.Locker.Location == data.LocationReceive);
+                if (tmp != null && tmp2 == null)
+                {
+                    var listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserSend == null && x.Locker.Location == data.LocationReceive).ToList();
+                    if (listHistories.Any())
+                    {
+                        // Nếu có ít nhất một History thích hợp, chọn một ngẫu nhiên
+                        int randomIndex;
+                        randomIndex = random.Next(listHistories.Count);
+                        history = listHistories[randomIndex];
+                        return history;
+                    }
+                }
+                else
+                {
+                    return tmp2;
+                }
+            }
+            return null;
+        }
+
+        private User GetUser(OtpData data, string userId)
+        {
+            if (data.UserIdReceive != null)
+            {
+                return _context.Users.Find(data.UserIdReceive);
+            }
+            else
+            {
+                return _context.Users.Find(data.UserIdSend);
+            }
+        }
+
+        private string GenerateOtpCode()
+        {
+            byte[] newSecretKey = Encoding.UTF8.GetBytes(GenerateRandomString(50));
+            var totp = new Totp(newSecretKey, step: 10800);
+            return totp.ComputeTotp(DateTime.UtcNow);
+        }
+
+        private Otp SaveOtp(string otpCode, User user, History history)
+        {
             Guid guid = Guid.NewGuid();
-            OtpSecretKey otpSecret = new OtpSecretKey(newSecretKey, otpCode);
-            _secretKeys.Add(otpSecret);
             Otp otp = new Otp
             {
                 OtpId = guid.ToString(),
@@ -235,36 +272,13 @@ namespace SmartLockerAPI.Controllers
                 UserId = user.UserId,
                 LockerId = history.LockerId
             };
-            if (user.RoleId == "3")
-            {
-                listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserId == null && x.Locker.Location == data.LocationReceive).ToList();
-                int randomIndexShipper;
-                History randomLockerShipper;
-                if (listHistories.Any())
-                {
-                    randomIndexShipper = random.Next(listHistories.Count);
-                    randomLockerShipper = listHistories[randomIndexShipper];
-                    if (randomLockerShipper != null)
-                    {
-                        randomLockerShipper.UserId = user.UserId;
-                    }
-                }
-                else
-                {
-                    listHistories = new List<History>();
-                    randomLockerShipper = new History();
-                }
-                if (listHistories.Count() <= 0 || randomLockerShipper == null)
-                {
-                    return BadRequest(new { title = "No locker at this time" });
-                }
-            }
-            
+
             _context.Otps.Add(otp);
             _context.SaveChanges();
 
-            return Ok(new { otp = otpCode });
+            return otp;
         }
+
 
         [Authorize]
         [HttpPost("sendmail")]
@@ -353,5 +367,11 @@ namespace SmartLockerAPI.Controllers
         public string? StartTime { get; set; }
         public string? LocationSend { get; set; }
         public string? LocationReceive { get; set; }
+    }
+
+    public class PostOtp
+    {
+        public string? otp { get; set; }
+        public string? lockerId { get; set; }
     }
 }
