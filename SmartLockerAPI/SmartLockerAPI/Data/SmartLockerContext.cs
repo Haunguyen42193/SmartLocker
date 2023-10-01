@@ -36,7 +36,7 @@ public partial class SmartLockerContext : DbContext
 
             entity.HasIndex(e => e.LockerId, "fk_histories_lockers_idx");
 
-            entity.HasIndex(e => e.UserId, "fk_histories_users_idx");
+            entity.HasIndex(e => e.UserSend, "fk_histories_users_idx");
 
             entity.Property(e => e.HistoryId)
                 .HasMaxLength(45)
@@ -50,16 +50,22 @@ public partial class SmartLockerContext : DbContext
             entity.Property(e => e.StartTime)
                 .HasMaxLength(45)
                 .HasColumnName("start_time");
-            entity.Property(e => e.UserId)
+            entity.Property(e => e.UserSend)
                 .HasMaxLength(45)
-                .HasColumnName("user_id");
+                .HasColumnName("user_send");
+            entity.Property(e => e.Shipper)
+                .HasMaxLength(45)
+                .HasColumnName("shipper");
+            entity.Property(e => e.Receiver)
+                .HasMaxLength(45)
+                .HasColumnName("receiver");
 
             entity.HasOne(d => d.Locker).WithMany(p => p.Histories)
                 .HasForeignKey(d => d.LockerId)
                 .HasConstraintName("fk_histories_lockers_idx");
 
             entity.HasOne(d => d.User).WithMany(p => p.Histories)
-                .HasForeignKey(d => d.UserId)
+                .HasForeignKey(d => d.UserSend)
                 .HasConstraintName("fk_histories_users_idx");
         });
 
