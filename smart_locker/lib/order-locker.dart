@@ -20,7 +20,8 @@ class _OrderLockerState extends State<OrderLocker> {
   String selectedLocation1 = "Location1"; // Điểm gửi mặc định
   String selectedLocation2 = "Location2"; // Điểm đến mặc định
   List<String> availableHours = [];
-  // String selectedUserId = ''; // Thêm biến này để lưu trữ userId người được chọn
+  String selectedUserId =
+      'U000'; // Thêm biến này để lưu trữ userId người được chọn
   List<Map<String, dynamic>> users = [];
   TextEditingController txtOtp = TextEditingController();
   String otp = '';
@@ -49,13 +50,22 @@ class _OrderLockerState extends State<OrderLocker> {
       final List<Map<String, dynamic>> userList =
           List<Map<String, dynamic>>.from(jsonDecode(response.body));
 
-      final filteredUsers =
-          userList.where((user) => user['userId'] != userIdLoggin).toList();
+      // Lọc danh sách người dùng và loại bỏ người dùng đã đăng nhập và có roleId là 3
+      final filteredUsers = userList.where((user) {
+        final String userId = user['userId'];
+        final String roleIdStr = user['roleId'];
+
+        // Kiểm tra xem roleId có thể được chuyển thành số nguyên hay không
+        final int? roleId = int.tryParse(roleIdStr);
+
+        // Kiểm tra nếu roleId không null và không bằng 3
+        return userId != userIdLoggin && roleId != null && roleId != 3;
+      }).toList();
 
       setState(() {
         users = filteredUsers;
         selectedRecipient = users.isNotEmpty ? users[0]['name'] : '';
-        // selectedUserId = users.isNotEmpty ? users[0]['userId'] : '';
+        selectedUserId = users.isNotEmpty ? users[0]['userId'] : '';
       });
     } else if (response.statusCode == 401) {
       print('Chưa đăng nhập');
@@ -164,10 +174,11 @@ class _OrderLockerState extends State<OrderLocker> {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        'startTime': startTime,
-        'userId': userId,
-        'locationSend': selectedLocation1,
-        'locationReceive': selectedLocation2,
+        "userIdSend": userId,
+        "userIdReceive": null,
+        "startTime": startTime,
+        "locationSend": selectedLocation1,
+        "locationReceive": selectedLocation2
       }),
     );
 
@@ -191,8 +202,14 @@ class _OrderLockerState extends State<OrderLocker> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                ConfirmOrderScreen(authStatus: widget.authStatus)),
+          builder: (context) => ConfirmOrderScreen(
+            authStatus: widget.authStatus,
+            userReceive: selectedUserId, // Truyền người nhận vào ConfirmOrderScreen
+            startTime: startTime,
+            locationSend: selectedLocation1,
+            locationReceive: selectedLocation2,
+          ),
+        ),
       );
     } else if (response.statusCode == 400) {
       print('Hết tủ');

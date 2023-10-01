@@ -3,6 +3,8 @@ import 'models.dart';
 import 'login_screen.dart';
 import 'account.dart';
 import 'order-locker.dart';
+import 'order.dart';
+
 void main() => runApp(MyApp(authStatus: null));
 
 class MyApp extends StatelessWidget {
@@ -35,17 +37,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   int _currentIndex = 0; // Sử dụng để theo dõi mục đang được chọn trong menu
   bool _showBackButton = false; // Để ẩn/hiện nút quay về
   final AuthStatus authStatus; // Thêm tham số authStatus
   final List<Widget> _children;
+  bool isReserveButtonEnabled = true;
 
   _HomeScreenState({required this.authStatus})
       : _children = [
           Home(), // Trang chủ
           Reserve(
-              authStatus: authStatus), // Đặt tủ và truyền authStatus vào đây
+              authStatus:
+                  authStatus), // Đặt tủ và truyền authStatus vào đây nếu roleId khác 3
+          Order(authStatus: authStatus),
           Login(), // Đăng nhập
         ];
 
@@ -88,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: _children[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         onTap: (index) {
-          if (index == 2 && widget.authStatus.isLoggedIn) {
+          if (index == 3 && widget.authStatus.isLoggedIn) {
             // Chuyển đến trang giao diện tài khoản và truyền đối tượng User
             Navigator.push(
               context,
@@ -116,10 +120,20 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Đặt tủ',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag),
+            label: 'Đơn hàng',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: widget.authStatus.isLoggedIn ? 'Tài khoản' : 'Đăng nhập',
-          ),
+          )
         ],
+        selectedFontSize: 14.0, // Kích thước chữ cho tab đã chọn
+        unselectedFontSize: 14.0, // Kích thước chữ cho tab chưa chọn
+        selectedItemColor:
+            Color.fromARGB(255, 230, 7, 7), // Màu cho tab đã chọn
+        unselectedItemColor:
+            const Color.fromARGB(255, 0, 0, 0), // Màu cho tab chưa chọn
       ),
     );
   }
@@ -145,28 +159,54 @@ class Reserve extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // ElevatedButton(
+          //   onPressed: () {
+          //     if (authStatus.isLoggedIn) {
+          //       // Đã đăng nhập, chuyển đến OrderLocker
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => OrderLocker(authStatus: authStatus),
+          //         ),
+          //       );
+          //     } else {
+          //       // Chưa đăng nhập, chuyển đến LoginScreen
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => LoginScreen(),
+          //         ),
+          //       );
+          //     }
+          //   },
+          //   child: Text('Bắt đầu đăng ký tủ'),
+          // ),
           ElevatedButton(
-            onPressed: () {
-              if (authStatus.isLoggedIn) {
-                // Đã đăng nhập, chuyển đến OrderLocker
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OrderLocker(authStatus: authStatus),
-                  ),
-                );
-              } else {
-                // Chưa đăng nhập, chuyển đến LoginScreen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(),
-                  ),
-                );
-              }
-            },
+            onPressed: authStatus.user.role != "3"
+                ? () {
+                    // Xử lý khi người dùng bấm nút (điều này chỉ xảy ra khi role không phải là 3)
+                    if (authStatus.isLoggedIn) {
+                      // Đã đăng nhập, chuyển đến OrderLocker
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              OrderLocker(authStatus: authStatus),
+                        ),
+                      );
+                    } else {
+                      // Chưa đăng nhập, chuyển đến LoginScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginScreen(),
+                        ),
+                      );
+                    }
+                  }
+                : null, // Đặt onPressed thành null khi role là 3
             child: Text('Bắt đầu đăng ký tủ'),
-          ),
+          )
         ],
       ),
     );
@@ -191,6 +231,44 @@ class Login extends StatelessWidget {
               );
             },
             child: Text('Bắt đầu đăng nhập'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Order extends StatelessWidget {
+  final AuthStatus authStatus;
+  Order({required this.authStatus});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              if (authStatus.isLoggedIn) {
+                // Đã đăng nhập, chuyển đến OrderLocker
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OrderList(authStatus: authStatus),
+                  ),
+                );
+              } else {
+                // Chưa đăng nhập, chuyển đến LoginScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ),
+                );
+              }
+            },
+            child: Text('Xác nhận đơn hàng'),
           ),
         ],
       ),
