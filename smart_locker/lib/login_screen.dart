@@ -14,24 +14,46 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
+  bool isLoading = false;
   final storage = FlutterSecureStorage();
+
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Color.fromARGB(255, 253, 145, 145),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 
   Future<void> login(BuildContext context) async {
     final username = usernameController.text;
     final password = passwordController.text;
 
+    // Đặt isLoading thành true để hiển thị nút xoay tròn
+    setState(() {
+      isLoading = true;
+    });
+
     final response = await http.post(
-      Uri.parse(
-          '$endpoint/api/Users/authenticate'),
+      Uri.parse('$endpoint/api/Users/authenticate'),
       body: jsonEncode({'phone': username, 'password': password}),
       headers: {'Content-Type': 'application/json'},
     );
 
+    // Sau khi hoàn thành yêu cầu, đặt isLoading lại thành false
+    setState(() {
+      isLoading = false;
+    });
+
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body);
       final token = jsonDecode(response.body)['token'];
-      // Lưu token vào bộ nhớ an toàn để sử dụng sau này
       await storage.write(key: 'token', value: token);
       final user = User(
         userData['id'],
@@ -41,17 +63,16 @@ class _LoginScreenState extends State<LoginScreen> {
         userData['role'],
       );
       final authStatus = AuthStatus(true, user);
-      // Điều hướng đến màn hình chính sau khi đăng nhập thành công
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => HomeScreen(authStatus: authStatus),
         ),
       );
+      _showSnackBar("Đăng nhập thành công");
     } else {
-      print(response.statusCode);
-      // Xử lý lỗi đăng nhập
       print('Đăng nhập thất bại');
+      _showSnackBar("Đăng nhập thất bại");
     }
   }
 
@@ -60,6 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Đăng nhập'),
+        backgroundColor: Color.fromARGB(255, 253, 145, 145),
       ),
       body: Center(
         child: Column(
@@ -75,11 +97,19 @@ class _LoginScreenState extends State<LoginScreen> {
               obscureText: true,
             ),
             ElevatedButton(
-              onPressed: () {
-                login(context);
-              },
+              style: ElevatedButton.styleFrom(
+                primary: Colors.red, // Đặt màu nền của nút là màu đỏ
+                onPrimary: Colors.white, // Đặt màu chữ trên nút là màu trắng
+              ),
+              onPressed: isLoading
+                  ? null
+                  : () {
+                      login(context);
+                    },
               child: Text('Đăng nhập'),
             ),
+            // Hiển thị vòng xoay loading khi isLoading là true
+            if (isLoading) CircularProgressIndicator(),
           ],
         ),
       ),
