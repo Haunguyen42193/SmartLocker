@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:smart_locker/main.dart';
-import 'package:smart_locker/models.dart'; 
+import 'package:smart_locker/models.dart';
 import 'config.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'order-locker.dart';
-
 
 class ConfirmOrderScreen extends StatefulWidget {
   final AuthStatus authStatus;
@@ -15,14 +14,17 @@ class ConfirmOrderScreen extends StatefulWidget {
   final String startTime;
   final String locationSend;
   final String locationReceive;
+  final String historyId;
+  final Otp otpSend;
 
-  ConfirmOrderScreen({
-    required this.authStatus,
-    required this.userReceive,
-    required this.startTime,
-    required this.locationSend,
-    required this.locationReceive,
-  });
+  ConfirmOrderScreen(
+      {required this.authStatus,
+      required this.userReceive,
+      required this.startTime,
+      required this.locationSend,
+      required this.locationReceive,
+      required this.historyId,
+      required this.otpSend});
 
   @override
   _ConfirmOrderScreenState createState() => _ConfirmOrderScreenState();
@@ -37,6 +39,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
   String selectedRecipient = "Người nhận số 0";
   List<Map<String, dynamic>> filteredUsers = [];
 
+  String historyIdNew = "";
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -52,31 +56,45 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
         'Authorization': 'Bearer $token',
       },
     );
+
     if (response.statusCode == 200) {
-      final List<Map<String, dynamic>> userList =
-          List<Map<String, dynamic>>.from(jsonDecode(response.body));
+      final dynamic responseData = jsonDecode(response.body);
 
-      // Lọc danh sách user có roleId là 3
-      final filteredUsers = userList.where((user) {
-        final String roleIdStr = user['roleId'];
+      if (responseData is Map<String, dynamic> &&
+          responseData.containsKey('\$values')) {
+        final List<dynamic> userList = responseData['\$values'];
 
-        // Kiểm tra xem roleId có thể được chuyển thành số nguyên hay không
-        final int? roleId = int.tryParse(roleIdStr);
+        // Lọc danh sách user có roleId là 3
+        final List<dynamic> filteredUsers = userList.where((user) {
+          final String roleIdStr = user['roleId'];
 
-        return roleId == 3;
-      }).toList();
+          // Kiểm tra xem roleId có thể được chuyển thành số nguyên hay không
+          final int? roleId = int.tryParse(roleIdStr);
 
-      // Lấy một user ngẫu nhiên nếu danh sách không rỗng
-      if (filteredUsers.isNotEmpty) {
-        final random = Random();
-        final randomUserIndex = random.nextInt(filteredUsers.length);
-        final randomUser = filteredUsers[randomUserIndex];
+          return roleId == 3;
+        }).toList();
 
-        setState(() {
-          selectedRecipient = randomUser['name'] ?? '';
-          selectedUserId = randomUser['userId'] ?? '';
-        });
+        // Lấy một user ngẫu nhiên nếu danh sách không rỗng
+        if (filteredUsers.isNotEmpty) {
+          final random = Random();
+          final randomUserIndex = random.nextInt(filteredUsers.length);
+          final randomUser = filteredUsers[randomUserIndex];
+
+          setState(() {
+            selectedRecipient = randomUser['name'] ?? '';
+            selectedUserId = randomUser['userId'] ?? '';
+          });
+        } else {
+          // Xử lý trường hợp danh sách không có người dùng có roleId là 3
+          print('Không có người dùng có roleId là 3.');
+        }
+      } else {
+        print('Dữ liệu JSON không có cấu trúc phù hợp.');
       }
+    } else if (response.statusCode == 401) {
+      print('Chưa đăng nhập');
+    } else {
+      print("Lỗi Server");
     }
   }
 
@@ -87,20 +105,37 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
           message,
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Color.fromARGB(255, 253, 145, 145),
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
-  Future<void> sendOTPRequest({
-    required String userReceive,
-    required String startTime,
-    required String locationSend,
-    required String locationReceive,
-  }) async {
+  Future<void> sendOTPRequest(
+      {required String userReceive,
+      required String startTime,
+      required String locationSend,
+      required String locationReceive,
+      required String historyId,
+      required Otp otpSend}) async {
     final token = await storage.read(key: 'token');
     final userId = widget.authStatus.user.id;
+    setState(() {
+      isLoading = true;
+    });
+    final response3 = await http.post(
+      Uri.parse('$endpoint/api/Histories'),
+      body: jsonEncode({
+        "historyId": historyId,
+        "userSend": userId,
+        "shipper": selectedUserId,
+        "receiver": userReceive
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
 
     final response = await http.post(
       Uri.parse('$endpoint/api/Otps/generatedotp'),
@@ -118,9 +153,45 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     );
 
     if (response.statusCode == 200) {
-      otp = jsonDecode(response.body)['otp'];
+      final otp = jsonDecode(response.body)['otp'];
+      final otpData = Otp(otp['otpId'], otp['otpCode'], otp['expirationTime'],
+          otp['userId'], otp['lockerId']);
+      final otpCode = otpData.otpCode;
+      final otpId = otpSend.otpId;
+      historyIdNew = jsonDecode(response.body)['historyId'];
       String messageMail =
-          "Hi $selectedRecipient,\n\nYour OTP is $otp.\n\nUsing this for unlocked Smartlocker to transport \n\nContact us: 0987654321";
+          "Hi $selectedRecipient,\n\nYour OTP is $otpCode.\n\nUsing this for unlocked Smartlocker to transport \n\nContact us: 0987654321";
+      // Xóa otp
+      final response6 = await http.delete(
+        Uri.parse('$endpoint/api/Otps/$otpId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final response4 = await http.post(
+        Uri.parse('$endpoint/api/Histories'),
+        body: jsonEncode({
+          "historyId": historyIdNew,
+          "userSend": userId,
+          "shipper": selectedUserId,
+          "receiver": userReceive
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final response5 = await http.post(
+        Uri.parse('$endpoint/api/Otps'),
+        body: jsonEncode({"otp": otpCode, "lockerId": otpSend.lockerId}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
 
       final response2 = await http.post(
         Uri.parse('$endpoint/api/Otps/sendmail'),
@@ -140,31 +211,51 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     } else {
       print("Lỗi Server");
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Xác nhận đặt tủ'),
+        title: Text('Xác nhận gửi hàng'),
+        backgroundColor: Color.fromARGB(255, 253, 145, 145),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Xử lý khi nút xác nhận được nhấn
-                // Đặt tủ ở đây và sử dụng authStatus nếu cần
-                sendOTPRequest(
-                  userReceive: widget.userReceive,
-                  startTime: widget.startTime,
-                  locationSend: widget.locationSend,
-                  locationReceive: widget.locationReceive,
-                );
-              },
-              child: Text('Xác nhận đặt tủ'),
+            Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red, // Đặt màu nền của nút là màu đỏ
+                    onPrimary:
+                        Colors.white, // Đặt màu chữ trên nút là màu trắng
+                  ),
+                  onPressed: () {
+                    // Xử lý khi nút xác nhận được nhấn
+                    // Đặt tủ ở đây và sử dụng authStatus nếu cần
+                    sendOTPRequest(
+                        userReceive: widget.userReceive,
+                        startTime: widget.startTime,
+                        locationSend: widget.locationSend,
+                        locationReceive: widget.locationReceive,
+                        historyId: widget.historyId,
+                        otpSend: widget.otpSend);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Text('Xác nhận gửi hàng'),
+                  ),
+                ),
+                if (isLoading)
+                  CircularProgressIndicator(), // Hiển thị loading nếu isLoading là true
+              ],
             ),
             // Hiển thị thông báo
           ],

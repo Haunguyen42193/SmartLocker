@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartLocker.Data;
 using SmartLocker.Models;
+using static SmartLockerAPI.Controllers.HistoriesController;
 
 namespace SmartLockerAPI.Controllers
 {
@@ -50,6 +51,36 @@ namespace SmartLockerAPI.Controllers
             }
 
             return history;
+        }
+
+        [HttpPost("GetHistories")]
+        public ActionResult<List<History>> GetHistories([FromBody] HistoryRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.userId))
+            {
+                return BadRequest("Invalid request data.");
+            }
+
+            var histories = _context.Histories
+                            .Where(h => h.Shipper == request.userId || h.Receiver == request.userId)
+                            .ToList();
+
+            if (histories.Count == 0)
+            {
+                return NotFound("No histories found.");
+            }
+            var historyDtos = histories.Select(h => new History
+            {
+                HistoryId = h.HistoryId,
+                UserSend = h.UserSend,
+                LockerId = h.LockerId,
+                StartTime = h.StartTime,
+                EndTime = h.EndTime,
+                Shipper = h.Shipper,
+                Receiver = h.Receiver,
+
+            }).ToList();
+            return Ok(historyDtos);
         }
 
         // PUT: api/Histories/5
@@ -157,6 +188,11 @@ namespace SmartLockerAPI.Controllers
             public string? UserSend { get; set; }
             public string? Shipper { get; set; }
             public string? Receiver { get; set; }
+        }
+
+        public class HistoryRequest
+        {
+            public string userId { get; set; }
         }
     }
 }

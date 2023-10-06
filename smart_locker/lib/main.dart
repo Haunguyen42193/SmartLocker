@@ -87,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Tủ để đồ thông minh'),
+        backgroundColor: Color.fromARGB(255, 253, 145, 145),
         automaticallyImplyLeading: _showBackButton, // Ẩn/hiện nút quay về
       ),
       body: _children[_currentIndex],
@@ -159,29 +160,11 @@ class Reserve extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // ElevatedButton(
-          //   onPressed: () {
-          //     if (authStatus.isLoggedIn) {
-          //       // Đã đăng nhập, chuyển đến OrderLocker
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //           builder: (context) => OrderLocker(authStatus: authStatus),
-          //         ),
-          //       );
-          //     } else {
-          //       // Chưa đăng nhập, chuyển đến LoginScreen
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //           builder: (context) => LoginScreen(),
-          //         ),
-          //       );
-          //     }
-          //   },
-          //   child: Text('Bắt đầu đăng ký tủ'),
-          // ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Colors.red, // Đặt màu nền của nút là màu đỏ
+              onPrimary: Colors.white, // Đặt màu chữ trên nút là màu trắng
+            ),
             onPressed: authStatus.user.role != "3"
                 ? () {
                     // Xử lý khi người dùng bấm nút (điều này chỉ xảy ra khi role không phải là 3)
@@ -221,6 +204,10 @@ class Login extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Colors.red, // Đặt màu nền của nút là màu đỏ
+              onPrimary: Colors.white, // Đặt màu chữ trên nút là màu trắng
+            ),
             onPressed: () {
               // Điều hướng đến màn hình đăng nhập khi nút được nhấn
               Navigator.push(
@@ -249,6 +236,10 @@ class Order extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Colors.red, // Đặt màu nền của nút là màu đỏ
+              onPrimary: Colors.white, // Đặt màu chữ trên nút là màu trắng
+            ),
             onPressed: () {
               if (authStatus.isLoggedIn) {
                 // Đã đăng nhập, chuyển đến OrderLocker
