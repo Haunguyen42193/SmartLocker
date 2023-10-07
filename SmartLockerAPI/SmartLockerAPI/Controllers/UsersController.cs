@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartLocker.Data;
 using SmartLocker.Models;
-using SmartLockerAPI.Models;
+using SmartLockerAPI.Dto;
+using SmartLockerAPI.Helpers;
 using SmartLockerAPI.Services;
 
 namespace SmartLockerAPI.Controllers
@@ -26,6 +27,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // GET: api/Users
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
@@ -39,6 +41,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // GET: api/Users/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(string id)
         {
@@ -58,15 +61,24 @@ namespace SmartLockerAPI.Controllers
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(string id, User user)
+        public async Task<IActionResult> PutUser(string id, UserRequest user)
         {
             if (id != user.UserId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            User u = await _context.Users.FindAsync(id);
+
+            if (u == null)
+                return NotFound("Not found this user");
+
+            u.Mail = user.UserEmail;
+            u.Name = user.UserName;
+
+            _context.Entry(u).State = EntityState.Modified;
 
             try
             {
@@ -89,6 +101,7 @@ namespace SmartLockerAPI.Controllers
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
@@ -117,6 +130,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // DELETE: api/Users/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
@@ -134,32 +148,6 @@ namespace SmartLockerAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        [HttpPost("Login")]
-        public async Task<IActionResult> Login(String phone, String password)
-        {
-            if (_context.Users == null)
-            {
-                return Problem("Entity set 'SmartLockerContext.Users'  is null.");
-            }
-            var users = _context.Users.ToList();
-            foreach (var u in users)
-            {
-                if (u.Phone == phone && u.Password == password)
-                {
-                    return CreatedAtAction("Login", new { user = u });
-                }
-            }
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                throw;
-            }
-            return CreatedAtAction("Login", "Not found");
         }
 
         private bool UserExists(string id)

@@ -1,4 +1,4 @@
-﻿namespace SmartLockerAPI.Models
+﻿namespace SmartLockerAPI.Dto
 {
     using System.ComponentModel.DataAnnotations;
 

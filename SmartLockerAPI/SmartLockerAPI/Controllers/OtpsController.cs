@@ -22,6 +22,7 @@ using SmartLockerAPI.Services;
 using Otp = SmartLocker.Models.Otp;
 using Vonage;
 using Vonage.Request;
+using SmartLockerAPI.Dto;
 
 namespace SmartLockerAPI.Controllers
 {
@@ -74,7 +75,6 @@ namespace SmartLockerAPI.Controllers
 
         [Authorize]
         // PUT: api/Otps/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutOtp(string id, Otp otp)
         {
@@ -106,7 +106,6 @@ namespace SmartLockerAPI.Controllers
 
         [Authorize]
         // POST: api/Otps
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Otp>> PostOtp(PostOtp data)
         {
@@ -117,7 +116,7 @@ namespace SmartLockerAPI.Controllers
             Otp otp = _context.Otps.FirstOrDefault(o => o.OtpCode.Equals(data.otp));
             if (otp == null)
             {
-                return NotFound(new {message = "Can't find otp"});
+                return NotFound(new { message = "Can't find otp" });
             }
             otp.LockerId = data.lockerId;
             try
@@ -140,15 +139,32 @@ namespace SmartLockerAPI.Controllers
         }
 
         [Authorize]
-        // DELETE: api/Otps/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOtp(string otpCode)
+        [HttpGet("getbyuserid/{userId}")]
+        public async Task<IActionResult> getOtpByUserId(string userId)
         {
             if (_context.Otps == null)
             {
                 return NotFound();
             }
-            var otp = _context.Otps.FirstOrDefault(x => x.OtpCode == otpCode);
+            var otp = _context.Otps.Where(x => x.UserId == userId).ToList();
+            if (otp == null)
+            {
+                return NotFound();
+            }
+            return Ok(new { otp = otp });
+        }
+
+
+        [Authorize]
+        // DELETE: api/Otps/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteOtp(string id)
+        {
+            if (_context.Otps == null)
+            {
+                return NotFound();
+            }
+            var otp = _context.Otps.Find(id);
             if (otp == null)
             {
                 return NotFound();
@@ -192,7 +208,7 @@ namespace SmartLockerAPI.Controllers
             var otpCode = GenerateOtpCode();
             var otp = SaveOtp(otpCode, user, history);
 
-            return Ok(new { otp = otpCode, historyId = history.HistoryId });
+            return Ok(new { otp = otp, historyId = history.HistoryId });
         }
 
         private string GetUserIdFromToken(string token)
@@ -205,7 +221,7 @@ namespace SmartLockerAPI.Controllers
         {
             Random random = new Random();
             History history;
-            if (data.UserIdReceive == null) 
+            if (data.UserIdReceive == null)
             {
                 var listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserSend == null && x.Locker.Location == data.LocationSend).ToList();
                 if (listHistories.Any())
@@ -221,8 +237,7 @@ namespace SmartLockerAPI.Controllers
             else
             {
                 var tmp = _context.Histories.FirstOrDefault(x => x.Shipper == data.UserIdReceive && x.StartTime == data.StartTime && x.Locker.Location == data.LocationSend);
-                var tmp2 = _context.Histories.FirstOrDefault(x => x.Shipper == data.UserIdReceive && x.StartTime == data.StartTime && x.Locker.Location == data.LocationReceive);
-                if (tmp != null && tmp2 == null)
+                if (tmp != null)
                 {
                     var listHistories = _context.Histories.Where(x => x.StartTime == data.StartTime && x.UserSend == null && x.Locker.Location == data.LocationReceive).ToList();
                     if (listHistories.Any())
@@ -234,7 +249,8 @@ namespace SmartLockerAPI.Controllers
                         return history;
                     }
                 }
-                else
+                var tmp2 = _context.Histories.FirstOrDefault(x => x.Shipper == data.UserIdSend && x.StartTime == data.StartTime && x.Locker.Location == data.LocationReceive);
+                if (tmp2 != null)
                 {
                     return tmp2;
                 }
@@ -352,26 +368,5 @@ namespace SmartLockerAPI.Controllers
             });
             return Ok("Send sms successfull!");
         }
-
-    }
-    public class MailData
-    {
-        public string? UserId { get; set; }
-        public string? MailContent { get; set; }
-    }
-
-    public class OtpData
-    {
-        public string? UserIdSend { get; set; }
-        public string? UserIdReceive { get; set; }
-        public string? StartTime { get; set; }
-        public string? LocationSend { get; set; }
-        public string? LocationReceive { get; set; }
-    }
-
-    public class PostOtp
-    {
-        public string? otp { get; set; }
-        public string? lockerId { get; set; }
     }
 }
