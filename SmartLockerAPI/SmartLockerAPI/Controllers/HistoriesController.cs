@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartLocker.Data;
 using SmartLocker.Models;
+using SmartLockerAPI.Dto;
+using SmartLockerAPI.Helpers;
 using static SmartLockerAPI.Controllers.HistoriesController;
 
 namespace SmartLockerAPI.Controllers
@@ -23,6 +25,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // GET: api/Histories
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<History>>> GetHistories()
         {
@@ -36,6 +39,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // GET: api/Histories/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<History>> GetHistory(string id)
         {
@@ -53,6 +57,7 @@ namespace SmartLockerAPI.Controllers
             return history;
         }
 
+        [Authorize]
         [HttpPost("GetHistories")]
         public ActionResult<List<History>> GetHistories([FromBody] HistoryRequest request)
         {
@@ -84,7 +89,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // PUT: api/Histories/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutHistory(string id, History history)
         {
@@ -115,7 +120,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // POST: api/Histories
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<History>> PostHistory(HistoryData data)
         {
@@ -158,6 +163,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // DELETE: api/Histories/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHistory(string id)
         {
@@ -182,17 +188,6 @@ namespace SmartLockerAPI.Controllers
         {
             return (_context.Histories?.Any(e => e.HistoryId == id)).GetValueOrDefault();
         }
-        public class HistoryData
-        {
-            public string? HistoryId { get; set; }
-            public string? UserSend { get; set; }
-            public string? Shipper { get; set; }
-            public string? Receiver { get; set; }
-        }
 
-        public class HistoryRequest
-        {
-            public string userId { get; set; }
-        }
     }
 }

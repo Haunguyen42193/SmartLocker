@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartLocker.Data;
 using SmartLocker.Models;
+using SmartLockerAPI.Helpers;
 
 namespace SmartLockerAPI.Controllers
 {
@@ -22,6 +23,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // GET: api/Lockers
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Locker>>> GetLockers()
         {
@@ -33,6 +35,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // GET: api/Lockers/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Locker>> GetLocker(string id)
         {
@@ -51,7 +54,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // PUT: api/Lockers/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLocker(string id, Locker locker)
         {
@@ -82,7 +85,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // POST: api/Lockers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Locker>> PostLocker(Locker locker)
         {
@@ -111,6 +114,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // DELETE: api/Lockers/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLocker(string id)
         {

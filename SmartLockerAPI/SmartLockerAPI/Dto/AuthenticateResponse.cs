@@ -1,14 +1,14 @@
 ﻿using SmartLocker.Models;
 
-namespace SmartLockerAPI.Models
+namespace SmartLockerAPI.Dto
 {
     public class AuthenticateResponse
     {
-        public String Id { get; set; }
+        public string Id { get; set; }
         public string name { get; set; }
         public string mail { get; set; }
         public string phone { get; set; }
-        public String role { get; set; }
+        public string role { get; set; }
         public string Token { get; set; }
 
 

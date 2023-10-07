@@ -2,8 +2,8 @@
 using Microsoft.IdentityModel.Tokens;
 using SmartLocker.Data;
 using SmartLocker.Models;
+using SmartLockerAPI.Dto;
 using SmartLockerAPI.Helpers;
-using SmartLockerAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

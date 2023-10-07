@@ -22,6 +22,7 @@ using SmartLockerAPI.Services;
 using Otp = SmartLocker.Models.Otp;
 using Vonage;
 using Vonage.Request;
+using SmartLockerAPI.Dto;
 
 namespace SmartLockerAPI.Controllers
 {
@@ -74,7 +75,6 @@ namespace SmartLockerAPI.Controllers
 
         [Authorize]
         // PUT: api/Otps/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutOtp(string id, Otp otp)
         {
@@ -106,7 +106,6 @@ namespace SmartLockerAPI.Controllers
 
         [Authorize]
         // POST: api/Otps
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Otp>> PostOtp(PostOtp data)
         {
@@ -369,28 +368,5 @@ namespace SmartLockerAPI.Controllers
             });
             return Ok("Send sms successfull!");
         }
-
     }
-    public class MailData
-    {
-        public string? UserId { get; set; }
-        public string? MailContent { get; set; }
-    }
-
-    public class OtpData
-    {
-        public string? UserIdSend { get; set; }
-        public string? UserIdReceive { get; set; }
-        public string? StartTime { get; set; }
-        public string? LocationSend { get; set; }
-        public string? LocationReceive { get; set; }
-    }
-
-    public class PostOtp
-    {
-        public string? otp { get; set; }
-        public string? lockerId { get; set; }
-    }
-
-
 }

@@ -1,23 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "B:\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj": {}
+    "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerApi\\SmartLockerAPI\\SmartLockerAPI.csproj": {}
   },
   "projects": {
-    "B:\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj": {
+    "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerApi\\SmartLockerAPI\\SmartLockerAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "B:\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
+        "projectUniqueName": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerApi\\SmartLockerAPI\\SmartLockerAPI.csproj",
         "projectName": "SmartLockerAPI",
-        "projectPath": "B:\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\SmartLockerAPI.csproj",
-        "packagesPath": "C:\\Users\\ACER\\.nuget\\packages\\",
-        "outputPath": "B:\\SmartLocker\\SmartLockerAPI\\SmartLockerAPI\\obj\\",
+        "projectPath": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerApi\\SmartLockerAPI\\SmartLockerAPI.csproj",
+        "packagesPath": "C:\\Users\\fptshop.com.vn\\.nuget\\packages\\",
+        "outputPath": "E:\\HK9\\DAN\\Project\\SmartLocker\\SmartLockerApi\\SmartLockerAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\ACER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\fptshop.com.vn\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
@@ -26,6 +28,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -136,7 +139,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }
