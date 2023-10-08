@@ -50,10 +50,10 @@ import 'models.dart';
 import 'EditProfileScreen.dart';
 
 class AccountScreen extends StatelessWidget {
-  final User user; // Đối tượng User để hiển thị thông tin tài khoản
+  final AuthStatus authStatus; // Đối tượng User để hiển thị thông tin tài khoản
   final Function onLogout; // Callback để xử lý đăng xuất
 
-  AccountScreen({required this.user, required this.onLogout});
+  AccountScreen({required this.authStatus, required this.onLogout});
 
   void handleLogout() {
     // Gọi callback để thông báo về việc đăng xuất
@@ -64,7 +64,7 @@ class AccountScreen extends StatelessWidget {
     // Chuyển đến trang chỉnh sửa thông tin cá nhân
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => EditProfileScreen(user: user),
+        builder: (context) => EditProfileScreen(authStatus: authStatus),
       ),
     );
   }
@@ -81,7 +81,7 @@ class AccountScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Xin chào, ${user.name}',
+              'Xin chào, ${authStatus.user.name}',
               style: TextStyle(
                 fontSize: 18.0, 
                 fontWeight: FontWeight.bold, 

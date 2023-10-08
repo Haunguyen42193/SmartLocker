@@ -3,12 +3,14 @@ class AuthStatus {
   User user;
 
   AuthStatus(this.isLoggedIn, this.user);
+  void updateUser(User updatedUser) {
+    user = updatedUser;
+  }
 
   // Thêm phương thức logout
   void logout() {
     isLoggedIn = false;
-    user = User("defaultId", "defaultName", "defaultEmail", "defaultPhone",
-        "defaultRole");
+    user = User.defaultUser();
   }
 }
 
@@ -18,8 +20,29 @@ class User {
   final String email;
   final String phone;
   final String role;
+  User.defaultUser()
+      : id = "defaultId",
+        name = "defaultName",
+        email = "defaultEmail",
+        phone = "defaultPhone",
+        role = "defaultRole";
+  User({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.role,
+  });
 
-  User(this.id, this.name, this.email, this.phone, this.role);
+  User copyWith({String? name, String? email}) {
+    return User(
+      id: this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: this.phone,
+      role: this.role,
+    );
+  }
 }
 
 class Otp {

@@ -17,7 +17,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
   final storage = FlutterSecureStorage();
 
-
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -56,11 +55,11 @@ class _LoginScreenState extends State<LoginScreen> {
       final token = jsonDecode(response.body)['token'];
       await storage.write(key: 'token', value: token);
       final user = User(
-        userData['id'],
-        userData['name'],
-        userData['mail'],
-        userData['phone'],
-        userData['role'],
+        id: userData['id'],
+        name: userData['name'],
+        email: userData['mail'],
+        phone: userData['phone'],
+        role: userData['role'],
       );
       final authStatus = AuthStatus(true, user);
       Navigator.pushReplacement(

@@ -17,8 +17,7 @@ class MyApp extends StatelessWidget {
     final effectiveAuthStatus = authStatus ??
         AuthStatus(
             false,
-            User("defaultId", "defaultName", "defaultEmail", "defaultPhone",
-                "defaultRole"));
+            User.defaultUser());
 
     return MaterialApp(
       home: HomeScreen(authStatus: effectiveAuthStatus),
@@ -99,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => AccountScreen(
-                  user: widget.authStatus.user,
+                  authStatus: widget.authStatus,
                   onLogout: onLogout, // Truyền hàm callback onLogout
                 ),
               ),
