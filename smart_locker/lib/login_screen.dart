@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'main.dart';
 import 'models.dart';
+import 'package:flutter/services.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -75,42 +76,201 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('Đăng nhập'),
+  //       backgroundColor: Color.fromARGB(255, 253, 145, 145),
+  //     ),
+  //     body: Center(
+  //       child: Column(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: <Widget>[
+  //           TextField(
+  //             controller: usernameController,
+  //             decoration: InputDecoration(labelText: 'Số điện thoại'),
+  //           ),
+  //           TextField(
+  //             controller: passwordController,
+  //             decoration: InputDecoration(labelText: 'Mật khẩu'),
+  //             obscureText: true,
+  //           ),
+  //           ElevatedButton(
+  //             style: ElevatedButton.styleFrom(
+  //               primary: Colors.red, // Đặt màu nền của nút là màu đỏ
+  //               onPrimary: Colors.white, // Đặt màu chữ trên nút là màu trắng
+  //             ),
+  //             onPressed: isLoading
+  //                 ? null
+  //                 : () {
+  //                     login(context);
+  //                   },
+  //             child: Text('Đăng nhập'),
+  //           ),
+  //           // Hiển thị vòng xoay loading khi isLoading là true
+  //           if (isLoading) CircularProgressIndicator(),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+//   @override
+// Widget build(BuildContext context) {
+//   return Scaffold(
+//     appBar: AppBar(
+//       title: Text('Đăng nhập'),
+//       backgroundColor: Colors.transparent, // Đặt màu nền trong suốt cho Appbar
+//     ),
+//     extendBodyBehindAppBar: true, // Mở rộng màu nền trong suốt đến Appbar
+//     body: Stack(
+//       children: <Widget>[
+//         Image.network(
+//           'https://images.pexels.com/photos/1707215/pexels-photo-1707215.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', // Đặt đường dẫn đến hình ảnh từ internet
+//           fit: BoxFit.cover,
+//           width: double.infinity,
+//           height: double.infinity,
+//         ),
+//         Center(
+//           child: Container(
+//             margin: EdgeInsets.all(20),
+//             padding: EdgeInsets.all(20),
+//             color: Colors.black.withOpacity(0.6), // Đặt màu nền trong suốt cho form đăng nhập
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: <Widget>[
+//                 TextField(
+//                   controller: usernameController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Số điện thoại',
+//                     filled: true,
+//                     fillColor: Colors.white, // Đặt màu nền cho ô input
+//                   ),
+//                 ),
+//                 SizedBox(height: 16.0),
+//                 TextField(
+//                   controller: passwordController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Mật khẩu',
+//                     filled: true,
+//                     fillColor: Colors.white, // Đặt màu nền cho ô input
+//                   ),
+//                   obscureText: true,
+//                 ),
+//                 SizedBox(height: 16.0),
+//                 ElevatedButton(
+//                   style: ElevatedButton.styleFrom(
+//                     primary: Colors.red,
+//                     onPrimary: Colors.white,
+//                   ),
+//                   onPressed: isLoading ? null : () {
+//                     login(context);
+//                   },
+//                   child: Text('Đăng nhập'),
+//                 ),
+//                 if (isLoading) SizedBox(height: 16.0),
+//                 if (isLoading) CircularProgressIndicator(),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Đăng nhập'),
-        backgroundColor: Color.fromARGB(255, 253, 145, 145),
+        backgroundColor: Colors.transparent,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              controller: usernameController,
-              decoration: InputDecoration(labelText: 'Số điện thoại'),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: InputDecoration(labelText: 'Mật khẩu'),
-              obscureText: true,
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Colors.red, // Đặt màu nền của nút là màu đỏ
-                onPrimary: Colors.white, // Đặt màu chữ trên nút là màu trắng
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        children: <Widget>[
+          Image.network(
+            'https://images.pexels.com/photos/1707215/pexels-photo-1707215.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
+          Center(
+            child: Container(
+              margin: EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(10.0), // Đặt góc tròn
               ),
-              onPressed: isLoading
-                  ? null
-                  : () {
-                      login(context);
-                    },
-              child: Text('Đăng nhập'),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  // TextField(
+                  //   controller: usernameController,
+                  //   decoration: InputDecoration(
+                  //     labelText: 'Số điện thoại',
+                  //     filled: true,
+                  //     fillColor: Colors.white,
+                  //     border: OutlineInputBorder(
+                  //       borderRadius: BorderRadius.circular(10.0), // Đặt góc tròn
+                  //     ),
+                  //   ),
+                  // ),
+                  TextField(
+  controller: usernameController,
+  decoration: InputDecoration(
+    labelText: 'Số điện thoại',
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10.0),
+    ),
+  ),
+  inputFormatters: [
+    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+  ],
+  keyboardType: TextInputType.phone, // Đặt loại bàn phím thành số điện thoại
+),
+
+
+                  SizedBox(height: 16.0),
+                  TextField(
+                    controller: passwordController,
+                    decoration: InputDecoration(
+                      labelText: 'Mật khẩu',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(10.0), // Đặt góc tròn
+                      ),
+                      suffixIcon:
+                          Icon(Icons.lock), // Thêm icon ở cuối TextField
+                    ),
+                    obscureText: true,
+                  ),
+                  SizedBox(height: 16.0),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                      onPrimary: Colors.white,
+                    ),
+                    onPressed: isLoading
+                        ? null
+                        : () {
+                            login(context);
+                          },
+                    child: Text('Đăng nhập'),
+                  ),
+                  if (isLoading) SizedBox(height: 16.0),
+                  if (isLoading) CircularProgressIndicator(),
+                ],
+              ),
             ),
-            // Hiển thị vòng xoay loading khi isLoading là true
-            if (isLoading) CircularProgressIndicator(),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

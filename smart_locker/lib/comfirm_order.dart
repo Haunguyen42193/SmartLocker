@@ -11,6 +11,7 @@ import 'order-locker.dart';
 class ConfirmOrderScreen extends StatefulWidget {
   final AuthStatus authStatus;
   final String userReceive;
+  final String nameUserReceive;
   final String startTime;
   final String locationSend;
   final String locationReceive;
@@ -20,6 +21,7 @@ class ConfirmOrderScreen extends StatefulWidget {
   ConfirmOrderScreen(
       {required this.authStatus,
       required this.userReceive,
+      required this.nameUserReceive,
       required this.startTime,
       required this.locationSend,
       required this.locationReceive,
@@ -113,6 +115,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
   Future<void> sendOTPRequest(
       {required String userReceive,
+      required String nameUserReceive,
       required String startTime,
       required String locationSend,
       required String locationReceive,
@@ -202,6 +205,18 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
           'Authorization': 'Bearer $token',
         },
       );
+
+      String messageMail2 =
+          "Hi $nameUserReceive, you have an order in progress, please pay attention and check .\n\nContact us: 0987654321";
+      final response3 = await http.post(
+        Uri.parse('$endpoint/api/Otps/sendmail'),
+        body:
+            jsonEncode({'userId': userReceive, 'mailContent': messageMail2}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
       _showSnackBar('Đã gửi mã OTP qua gmail của Shipper');
       Navigator.pop(context);
     } else if (response.statusCode == 400) {
@@ -242,6 +257,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                     // Đặt tủ ở đây và sử dụng authStatus nếu cần
                     sendOTPRequest(
                         userReceive: widget.userReceive,
+                        nameUserReceive: widget.nameUserReceive,
                         startTime: widget.startTime,
                         locationSend: widget.locationSend,
                         locationReceive: widget.locationReceive,
