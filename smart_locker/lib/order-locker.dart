@@ -226,7 +226,8 @@ class _OrderLockerState extends State<OrderLocker> {
             builder: (context) => ConfirmOrderScreen(
                 authStatus: widget.authStatus,
                 userReceive:
-                    selectedUserId, // Truyền người nhận vào ConfirmOrderScreen
+                    selectedUserId,
+                    nameUserReceive: selectedRecipient, // Truyền người nhận vào ConfirmOrderScreen
                 startTime: startTime,
                 locationSend: selectedLocation1,
                 locationReceive: selectedLocation2,
@@ -236,11 +237,11 @@ class _OrderLockerState extends State<OrderLocker> {
         );
       }
     } else if (response.statusCode == 400) {
-      print('Hết tủ');
+      _showSnackBar('Hết tủ');
     } else if (response.statusCode == 401) {
-      print('Chưa đăng nhập');
+      _showSnackBar('Chưa đăng nhập');
     } else {
-      print("Lỗi Server");
+      _showSnackBar('Lỗi server');
     }
     setState(() {
       isLoading = false;

@@ -41,7 +41,7 @@ namespace SmartLockerAPI.Controllers
         }
 
         // GET: api/Users/5
-        [Authorize]
+        //[Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(string id)
         {

@@ -57,6 +57,7 @@ class _OrderListState extends State<OrderList> {
 
   Future<void> getLocation() async {
     final userId = widget.authStatus.user.id;
+    final nameOfUser = widget.authStatus.user.name;
     final token = await storage.read(key: 'token');
     setState(() {
       isLoading = true;
@@ -147,6 +148,31 @@ class _OrderListState extends State<OrderList> {
                       },
                     );
                     if (deleteOtp.statusCode == 204) {
+                      final userSend = historyFind?.userSend;
+                      // Lấy tên người gửi
+                      final getNameUserSend = await http.get(
+                        Uri.parse('$endpoint/api/Users/$userSend'),
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': 'Bearer $token',
+                        },
+                      );
+                      if (getNameUserSend.statusCode == 200) {
+                        String nameUserSend = jsonDecode(getNameUserSend.body)['name'];
+                        String messageMail2 =
+                            "Hi $nameUserSend, $nameOfUser has taken the order.\n\nContact us: 0987654321";
+                        final response3 = await http.post(
+                          Uri.parse('$endpoint/api/Otps/sendmail'),
+                          body: jsonEncode({
+                            'userId': userSend,
+                            'mailContent': messageMail2
+                          }),
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer $token',
+                          },
+                        );
+                      }
                       _showSnackBar("Xác nhận lấy hàng thành công");
                       Navigator.pop(context);
                     } else {
@@ -421,11 +447,9 @@ class _OrderListState extends State<OrderList> {
                 !isLoading) // Ẩn nút đơn hàng khi đang xử lý hoặc xác nhận gửi hàng
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                            primary:
-                                Colors.red, // Đặt màu nền của nút là màu đỏ
-                            onPrimary: Colors
-                                .white, // Đặt màu chữ trên nút là màu trắng
-                          ),
+                  primary: Colors.red, // Đặt màu nền của nút là màu đỏ
+                  onPrimary: Colors.white, // Đặt màu chữ trên nút là màu trắng
+                ),
                 onPressed: () {
                   getLocation();
                 },
@@ -443,11 +467,10 @@ class _OrderListState extends State<OrderList> {
                   SizedBox(height: 16.0),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                            primary:
-                                Colors.red, // Đặt màu nền của nút là màu đỏ
-                            onPrimary: Colors
-                                .white, // Đặt màu chữ trên nút là màu trắng
-                          ),
+                      primary: Colors.red, // Đặt màu nền của nút là màu đỏ
+                      onPrimary:
+                          Colors.white, // Đặt màu chữ trên nút là màu trắng
+                    ),
                     onPressed: () {
                       // Xử lý khi nhấn nút Xác nhận gửi hàng
                       confirmSendPackage();
