@@ -49,4 +49,4 @@ Run project
 
 -> Mở môi trường ảo Mobile Emulator
 
--> Mở terminal -> nhập flutter run -> mở được giao diện 
+-> Mở terminal -> nhập flutter packages get -> nhập flutter run -> mở được giao diện 
